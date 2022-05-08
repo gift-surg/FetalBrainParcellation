@@ -1,0 +1,15 @@
+# Copyright 2021 Lucas Fidon
+
+data:
+  split: 0.9                          # ratio of data used for training vs validation
+  spacing: [0.8, 0.8, 0.8]
+  patch_size: [128, 160, 128]
+  data_augmentation: "nnUNet"
+
+network:
+  model_name: "DynUNet"
+  num_deep_supervision: 4
+
+log:
+  exp_name: "nnUNet_partial_LeafDiceCE"        # default name for the experiments using this config file
+  message: "nnU-Net in MONAI for partial supervision for fetal brain 3D MRI segmentation"

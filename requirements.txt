@@ -1,6 +1,0 @@
-Pillow==9.0.1
-torch
-tqdm
-nibabel>=2.1.0
-numpy>=1.13.3
-unet

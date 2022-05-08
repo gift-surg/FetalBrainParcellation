@@ -1,2 +1,0 @@
-model filter=lfs diff=lfs merge=lfs -text
-*.pt7 filter=lfs diff=lfs merge=lfs -text
