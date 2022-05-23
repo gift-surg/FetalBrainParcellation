@@ -1,4 +1,4 @@
-# Copyright 2021 Lucas Fidon and Suprosanna Shit
+# Copyright 2022 Lucas Fidon
 
 import os
 import yaml
@@ -23,7 +23,7 @@ def load_dataset_config(config_file=None):
 def load_feta_data_config():
     config_file = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
-        "fetal_challenge.yml"
+        "fetal_brain_dataset.yml"
     )
     config = load_dataset_config(config_file=config_file)
     return config

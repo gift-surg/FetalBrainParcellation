@@ -1,4 +1,4 @@
-# Copyright 2021 Lucas Fidon and Suprosanna Shit
+# Copyright 2022 Lucas Fidon
 import os
 import sys
 sys.path.insert(1, os.path.join(sys.path[0], '../../..'))
@@ -6,7 +6,7 @@ from src.deep_learning.data.fetal_transform_pipelines import fetal_inference_tra
 from src.deep_learning.data.single_case_dataloader import single_case_dataloader
 
 SUPPORTED_DATASET = [
-    'FeTAChallenge',
+    'Fetal',
 ]
 
 SUPPORTED_DATA_AUGMENTATION_PIPELINES = [
@@ -30,7 +30,7 @@ def get_single_case_dataloader(config, data_config, input_path_dict):
         (dataset_name, str(SUPPORTED_DATASET))
 
     # Get the inference transform pipeline for the dataset
-    if dataset_name == 'FeTAChallenge':
+    if dataset_name == 'Fetal':
         inference_pipeline = fetal_inference_transform(
             config=config,
             image_keys=data_config['info']['image_keys'],

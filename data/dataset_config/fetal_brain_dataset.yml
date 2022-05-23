@@ -1,11 +1,11 @@
 # Config file with the hyperparameters and paths
-# for Fetal brain 3D MRI parcellation with partial supervision.
+# for Fetal brain 3D MRI parcellation.
 
-name: 'FeTAChallenge'
+name: 'Fetal'
 
 path:
-  train: '/data/feta_challenge_training_Jun21'
-  test: '/data/feta_challenge_validation_Jul21'
+  train: ''
+  test: ''
 
 info:
   labels: {
@@ -16,6 +16,7 @@ info:
     'cortical_gm': 5,
     'deep_gm': 6,
     'brainstem': 7,
+    'cc': 8,
     'background': 0,
   }
   labels_superset: {
@@ -25,5 +26,5 @@ info:
   all_keys: ["srr", "label"]
 
 log:
-  name: 'FeTA'
-  message: "FeTA challenge fetal brain MRI dataset"
+  name: 'Fetal'
+  message: "Fetal brain MRI dataset"

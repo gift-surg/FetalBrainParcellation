@@ -1,4 +1,4 @@
-# Copyright 2021 Lucas Fidon and Suprosanna Shit
+# Copyright 2022 Lucas Fidon
 
 import os
 import yaml
@@ -8,7 +8,7 @@ def load_config(config_file=None):
     if config_file is None:  # default config file is nnUNet
         config_file = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "partialseg_fetal_challenge.yml"
+            "fetal_brain_segmentation.yml"
         )
     else:
         if not os.path.isfile(config_file):

@@ -1,4 +1,4 @@
-# Copyright 2021 Lucas Fidon and Suprosanna Shit
+# Copyright 2022 Lucas Fidon
 
 import os
 import torch
@@ -15,7 +15,7 @@ from src.deep_learning.data.factory import get_single_case_dataloader
 from data.config.loader import load_config
 from data.dataset_config.loader import load_feta_data_config
 from src.utils.definitions import \
-    MODELS_PATH, NUM_ITER_MASK_DILATION_BEFORE_INFERENCE, LABELS, CHALLENGE_LABELS
+    MODELS_PATH, NUM_ITER_MASK_DILATION_BEFORE_INFERENCE
 
 
 def _check_input_path(data_config, input_path_dict):
@@ -23,7 +23,7 @@ def _check_input_path(data_config, input_path_dict):
         assert key in list(input_path_dict.keys()), 'Input key %s not found in the input paths provided' % key
 
 
-def pred_softmax(img_path, mask_path, save_folder, convert_labels=True):
+def pred_softmax(img_path, mask_path, save_folder):
     # Load the config files
     config = load_config()
     data_config = load_feta_data_config()
@@ -40,7 +40,7 @@ def pred_softmax(img_path, mask_path, save_folder, convert_labels=True):
     mean_softmax = 0.
     meta_data = None
     for model_path in MODELS_PATH:
-        print('Run the inference for %s' % model_path)
+        print('Run the inference for %s...' % model_path)
         new_pred, meta_data = _pred_softmax_one_model(
             config=config,
             data_config=data_config,
@@ -50,18 +50,13 @@ def pred_softmax(img_path, mask_path, save_folder, convert_labels=True):
         mean_softmax += new_pred
     mean_softmax /= len(MODELS_PATH)
 
-    # Post-processing
-    if convert_labels:
-        mean_softmax = _postprocessing(mean_softmax=mean_softmax)
-
     # Save the softmax segmentation
     saver = NiftiSaver(output_dir=save_folder, output_postfix="softmax")
     saver.save_batch(mean_softmax, meta_data=meta_data)
 
-    # Save the segmentation (for inspection)
-    seg = mean_softmax.argmax(dim=1, keepdims=True).float()
-    saver_seg = NiftiSaver(output_dir=save_folder, output_postfix="seg")
-    saver_seg.save_batch(seg, meta_data=meta_data)
+    # Cleaning
+    if os.path.exists(preprocessed_img_path):
+        os.system('rm %s' % preprocessed_img_path)
 
 
 def _preprocessing(img_path, mask_path, save_folder):
@@ -72,13 +67,15 @@ def _preprocessing(img_path, mask_path, save_folder):
     mask_nii = nib.load(mask_path)
     mask_np = mask_nii.get_fdata().astype(np.uint8)
 
-    # Mask the Nans
-    if np.count_nonzero(np.isnan(mask_np)) > 0:
-        mask_np[np.isnan(mask_np)] = 0
-
     # Dilate the mask
     mask_dilated_np = binary_dilation(
-        mask_np, iterations=NUM_ITER_MASK_DILATION_BEFORE_INFERENCE)
+        mask_np,
+        iterations=NUM_ITER_MASK_DILATION_BEFORE_INFERENCE,
+    )
+
+    # Mask voxels of the SRR with nan values
+    if np.count_nonzero(np.isnan(img_np)) > 0:
+        mask_dilated_np[np.isnan(img_np)] = 0
 
     # Mask the image
     img_np[mask_dilated_np == 0] = 0
@@ -95,21 +92,18 @@ def _preprocessing(img_path, mask_path, save_folder):
     return save_path
 
 
-def _postprocessing(mean_softmax):
-    res = torch.zeros_like(mean_softmax)
-
-    # Change the order of the classes to match the convention of the challenge
-    for roi in list(LABELS.keys()):
-        res[:, CHALLENGE_LABELS[roi], ...] = mean_softmax[:, LABELS[roi], ...]
-
-    return res
+# def _postprocessing(mean_softmax):
+#     res = torch.zeros_like(mean_softmax)
+#
+#     # Change the order of the classes to match the convention of the challenge
+#     for roi in list(LABELS.keys()):
+#         res[:, CHALLENGE_LABELS[roi], ...] = mean_softmax[:, LABELS[roi], ...]
+#
+#     return res
 
 
 def _pred_softmax_one_model(config, data_config, model_path, input_path_dict):
     def pad_if_needed(img, patch_size):
-        # Define my own dummy padding function because the one from MONAI
-        # does not retain the padding values, and as a result
-        # we cannot unpad after inference...
         img_np = img.cpu().numpy()
         shape = img.shape[2:]
         need_padding = np.any(shape < np.array(patch_size))

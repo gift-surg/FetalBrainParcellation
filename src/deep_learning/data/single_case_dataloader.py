@@ -1,4 +1,4 @@
-# Copyright 2021 Lucas Fidon and Suprosanna Shit
+
 """
 Data loader for a single case.
 This is typically used for inference.
@@ -22,7 +22,7 @@ def single_case_dataloader(inference_transform, input_path_dict):
     loader = DataLoader(
         ds,
         batch_size=1,  # image-level batch to the sliding window method, not the window-level batch
-        num_workers=0, # you can set it to a value higher than 0 to activate parallel preprocessing; for me it leads to an error...
+        num_workers=0, # you can set it to a value higher than 0 to activate parallel preprocessing
         pin_memory=torch.cuda.is_available(),
     )
     return loader
