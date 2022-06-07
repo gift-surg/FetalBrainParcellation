@@ -1,0 +1,6 @@
+cache_dir
+.idea
+*pyc
+*.tar.gz
+**/tmp*
+__pycache__

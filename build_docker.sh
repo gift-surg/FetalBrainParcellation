@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-TEAM_NAME=trabit
 
 # Build the docker image
-docker build -f docker/Dockerfile -t feta_challenge/${TEAM_NAME} --rm .
+docker build -f docker/Dockerfile -t lucasfidon/fetal_brain_segmentation:0.1 --rm .

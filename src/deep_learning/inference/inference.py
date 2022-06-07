@@ -41,6 +41,7 @@ def pred_softmax(img_path, mask_path, save_folder):
     meta_data = None
     for model_path in MODELS_PATH:
         print('Run the inference for %s...' % model_path)
+        torch.cuda.empty_cache()  # Release all the possible memory on the GPUs
         new_pred, meta_data = _pred_softmax_one_model(
             config=config,
             data_config=data_config,
@@ -90,16 +91,6 @@ def _preprocessing(img_path, mask_path, save_folder):
     nib.save(new_img_nii, save_path)
 
     return save_path
-
-
-# def _postprocessing(mean_softmax):
-#     res = torch.zeros_like(mean_softmax)
-#
-#     # Change the order of the classes to match the convention of the challenge
-#     for roi in list(LABELS.keys()):
-#         res[:, CHALLENGE_LABELS[roi], ...] = mean_softmax[:, LABELS[roi], ...]
-#
-#     return res
 
 
 def _pred_softmax_one_model(config, data_config, model_path, input_path_dict):
@@ -198,5 +189,8 @@ def _pred_softmax_one_model(config, data_config, model_path, input_path_dict):
     full_softmax = torch.zeros(full_dim)
     full_softmax[:, 0, ...] = 1.  # background by default
     full_softmax[:, :, fg_start[0]:fg_end[0], fg_start[1]:fg_end[1], fg_start[2]:fg_end[2]] = softmax
+
+    # Put on cpu
+    full_softmax = full_softmax.cpu()
 
     return full_softmax, meta_data

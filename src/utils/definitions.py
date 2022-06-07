@@ -8,13 +8,14 @@ HOME_FOLDER = '/'
 WORKSPACE_FOLDER = os.path.join(HOME_FOLDER, 'workspace', 'FetalBrainParcellation')
 DATA_FOLDER = os.path.join(WORKSPACE_FOLDER, 'data')
 CNN_WEIGHTS_FOLDER = os.path.join(DATA_FOLDER, 'trained_deep_learning_models')
-MODELS_PATH = [
-    os.path.join(
+MODELS_PATH = []
+for i in range(10):
+    model_path = os.path.join(
         CNN_WEIGHTS_FOLDER,
         'model_apr22_split%d.pt' %i,
     )
-    for i in range(6)
-]
+    if os.path.exists(model_path):
+        MODELS_PATH.append(model_path)
 
 # ATLAS FOLDERS
 ATLAS_CONTROL_HARVARD = os.path.join(  # GA: 21 -> 37

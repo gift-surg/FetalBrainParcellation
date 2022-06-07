@@ -1,32 +1,46 @@
-FROM nvcr.io/nvidia/pytorch:20.06-py3
+# @brief  Docker image to install the environment to run the code in this repository.
+# @author Lucas Fidon (lucas.fidon@gmail.com).
+# @date   June 2022.
 
-MAINTAINER trabit
+# Image info
+FROM nvcr.io/nvidia/pytorch:21.08-py3
+LABEL maintainer="lucas.fidon@gmail.com"
+LABEL version="0.1"
+LABEL description="Docker for trustworthy fetal brain 3D T2w MRI segmentation."
 
-RUN apt-get update
+# Add third-party softwares
+ADD docker/third-party FetalBrainParcellation/third-party
 
-RUN apt-get install -y \
-    gcc-4.8 \
-    g++-4.8 \
-    make \
-    cmake \
-    git
+# Install commonly used packages
+RUN apt update
+RUN DEBIAN_FRONTEND=noninteractive apt upgrade -y
+RUN DEBIAN_FRONTEND=noninteractive apt install -y \
+    aptitude sudo vim zsh wget curl git net-tools \
+    rxvt-unicode tmux thunar locales build-essential cmake \
+    python3-pip
+RUN echo "alias python=python3" >> ~/.bash_aliases
 
-# Install MONAI
-RUN python -m pip install 'monai[all]'==0.5.2 SimpleITK==2.1.0
+# Remove unnecesary packages
+RUN DEBIAN_FRONTEND=noninteractive apt remove -y --purge gdm3 xserver-xephyr
 
-# Build NiftyReg
-RUN git clone https://github.com/KCL-BMEIS/niftyreg.git && mkdir niftyreg_build && mkdir niftyreg_install
-RUN cd niftyreg_build \
-    && cmake ../niftyreg \
-        -D CMAKE_BUILD_TYPE=Release \
-        -D CMAKE_INSTALL_PREFIX=../niftyreg_install \
-    && make \
-    && make install
-# Set the environment variables for NiftyReg
-ARG NIFTYREG_INSTALL="/workspace/niftyreg_install"
-ENV PATH="$PATH:$NIFTYREG_INSTALL/bin"
-ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$NIFTYREG_INSTALL/lib"
-RUN echo $PATH && echo $LD_LIBRARY_PATH
+# Install locales
+RUN locale-gen en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
 
-# Copy this repository in /feta_seg
-ADD . /feta_seg
+# Install MONAI (used for deep learning)
+RUN python -m pip install 'monai[all]'==0.7.0 SimpleITK==2.1.0 tensorboardX pyyaml nested_dict scipy==1.6.3
+
+
+# Copy necessary files
+COPY src FetalBrainParcellation/src
+COPY data FetalBrainParcellation/data
+COPY run_segment.py FetalBrainParcellation/run_segment.py
+
+# NiftyReg (used for medical image registration)
+ARG NIFTYREG="/workspace/FetalBrainParcellation/third-party/niftyreg/build/reg-apps"
+ENV PATH="$PATH:$NIFTYREG"
+
+# RUN CODE - the user can pass the argument of the run_segment.py script when creating a docker container
+ENTRYPOINT ["python","/workspace/FetalBrainParcellation/run_segment.py"]

@@ -59,7 +59,7 @@ def main(args):
     t0 = time.time()
     # Get paths and subject name
     T2wImagePath = args.img
-    sub = T2wImagePath.replace('.nii.gz', '')
+    sub = os.path.split(T2wImagePath)[1].replace('.nii.gz', '')
     if args.output_folder is None:
         outputDir = os.path.dirname(args.img)
     else:
@@ -115,9 +115,9 @@ def main(args):
     if use_TWAI:
         # Init
         img_nii = nib.load(T2wImagePath)
-        img = img_nii.get_fdata().astype(np.float32)
+        # img = img_nii.get_fdata().astype(np.float32)
         mask_nii = nib.load(maskPath)
-        mask = mask_nii.get_fdata().astype(np.uint8)
+        # mask = mask_nii.get_fdata().astype(np.uint8)
         # Fallback inference - Propagate the atlas volumes segmentation
         atlas_list = _get_atlas_volumes_path_list(cond, ga)
         print('\nStart atlas propagation using the volumes')
