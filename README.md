@@ -1,6 +1,8 @@
 # Trustworthy Fetal Brain 3D T2w MRI Segmentation
 A tool for the automatic segmentation of fetal brain 3D T2-weighted MRI.
 
+![auto-seg](https://user-images.githubusercontent.com/17875992/174453165-2ab9c26b-14da-4728-bec3-710166d12f7b.gif)
+
 ## System requirements
 ### Hardware requirements
 To run the automatic segmentation algorithms a NVIDIA GPU with at least 8GB of memory is required.
