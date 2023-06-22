@@ -1,3 +1,7 @@
+# Status update - 2023-06-22
+
+⚠️ **This repository is not actively maintained anymore**. Maintenance has moved to [LucasFidon/trustworthy-ai-fetal-brain-segmentation]([https://github.com/Project-MONAI/MONAI/](https://github.com/LucasFidon/trustworthy-ai-fetal-brain-segmentation)).
+
 # Trustworthy Fetal Brain 3D T2w MRI Segmentation
 A tool for the automatic segmentation of fetal brain 3D T2-weighted MRI.
 
